@@ -13,12 +13,27 @@
         <li><a href="{{ url_for('logout_mahasiswa') }}">Logout</a></li>
     </ul>
 
+    <!-- Form Pencarian -->
     <form method="POST">
         <input type="text" name="judul" placeholder="Cari jurnal..." value="{{ input_text }}" required>
-        <button type="submit">Cari</button>
+        <button type="submit" name="action" value="search">Cari</button>
     </form>
 
-    <!-- Bagian 1: Hasil Rekomendasi -->
+    <!-- Filter Bidang Minat (muncul setelah pencarian) -->
+    {% if is_recommendation and bidang_minat_tersedia %}
+    <form method="POST" style="margin-top: 20px;">
+        <input type="hidden" name="judul" value="{{ input_text }}">
+        <select name="filter_bidang_minat" onchange="this.form.submit()">
+            <option value="">-- Semua Bidang --</option>
+            {% for b in bidang_minat_tersedia %}
+            <option value="{{ b }}" {% if b== selected_bidang_minat %}selected{% endif %}>{{ b }}</option>
+            {% endfor %}
+        </select>
+        <input type="hidden" name="action" value="filter">
+    </form>
+    {% endif %}
+
+    <!-- Hasil Rekomendasi -->
     {% if is_recommendation %}
     <h3 style="margin-top: 50px;">Hasil Rekomendasi untuk: "{{ input_text }}" ({{ results_rekomendasi|length }}
         ditemukan)</h3>
@@ -38,11 +53,11 @@
         {% endfor %}
     </div>
     {% else %}
-    <p style="text-align:center;">Tidak ada jurnal yang cocok dengan pencarian Anda.</p>
+    <p style="text-align:center;">Tidak ada jurnal yang cocok dengan pencarian/filter Anda.</p>
     {% endif %}
     {% endif %}
 
-    <!-- Bagian 2: Jurnal Sesuai Bidang Minat -->
+    <!-- Jurnal Bidang Minat User -->
     <h3 style="margin-top: 30px;">Jurnal Sesuai Bidang Minat Anda ({{ results_bidang_minat|length }} ditemukan)</h3>
     {% if results_bidang_minat %}
     <div class="card-container">

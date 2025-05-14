@@ -18,7 +18,7 @@ app.config['MYSQL_DB'] = 'db_coba'
 mysql = MySQL(app)
 
 # Folder upload
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -162,29 +162,36 @@ def dashboard_mahasiswa():
     results_bidang_minat = []
     results_rekomendasi = []
     is_recommendation = False
+    selected_bidang_minat = ""
+    bidang_minat_tersedia = []
 
     engine = create_engine("mysql+mysqlconnector://root:@localhost/db_coba")
 
-    # Ambil bidang minat dari mahasiswa
+    # Ambil bidang minat user
     query_user = "SELECT bidang_minat FROM mahasiswa WHERE username = %s"
     bidang_minat_df = pd.read_sql(query_user, con=engine, params=(username,))
-
     if bidang_minat_df.empty:
         return "Data mahasiswa tidak ditemukan.", 404
 
     bidang_minat = bidang_minat_df.iloc[0]['bidang_minat']
 
-    # Ambil jurnal berdasarkan bidang minat
+    # Ambil jurnal sesuai bidang minat user
     query_jurnal = "SELECT judul, bidang_minat, fileName FROM jurnal_files WHERE bidang_minat = %s"
     results_bidang_minat = pd.read_sql(query_jurnal, con=engine, params=(bidang_minat,)).to_dict(orient='records')
 
     if request.method == "POST":
         input_text = request.form.get("judul", "").strip()
+        action = request.form.get("action")
+        selected_bidang_minat = request.form.get("filter_bidang_minat", "")
+
         if input_text:
             rekomendasi_raw = get_recommendation(input_text)
             is_recommendation = True
+            bidang_minat_tersedia = sorted(set(r['bidang_minat'] for r in rekomendasi_raw))
 
-            # Filter hanya data yang valid
+            if action == "filter" and selected_bidang_minat:
+                rekomendasi_raw = [r for r in rekomendasi_raw if r['bidang_minat'] == selected_bidang_minat]
+
             results_rekomendasi = [
                 r for r in rekomendasi_raw
                 if isinstance(r, dict) and 'judul' in r and 'fileName' in r and 'bidang_minat' in r
@@ -196,8 +203,11 @@ def dashboard_mahasiswa():
         results_bidang_minat=results_bidang_minat,
         results_rekomendasi=results_rekomendasi,
         input_text=input_text,
-        is_recommendation=is_recommendation
+        is_recommendation=is_recommendation,
+        bidang_minat_tersedia=bidang_minat_tersedia,
+        selected_bidang_minat=selected_bidang_minat
     )
+
 
 
 
