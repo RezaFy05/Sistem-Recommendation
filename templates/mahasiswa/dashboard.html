@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Mahasiswa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <h2>Selamat datang, {{ username }}</h2>
+    <ul>
+        <li><a href="{{ url_for('logout_mahasiswa') }}">Logout</a></li>
+    </ul>
+
+    <form method="POST">
+        <input type="text" name="judul" placeholder="Cari jurnal..." value="{{ input_text }}" required>
+        <button type="submit">Cari</button>
+    </form>
+
+    <!-- Bagian 1: Hasil Rekomendasi -->
+    {% if is_recommendation %}
+    <h3 style="margin-top: 50px;">Hasil Rekomendasi untuk: "{{ input_text }}" ({{ results_rekomendasi|length }}
+        ditemukan)</h3>
+    {% if results_rekomendasi %}
+    <div class="card-container">
+        {% for r in results_rekomendasi %}
+        <div class="card">
+            <h3>{{ r.judul }}</h3>
+            <p><strong>Bidang:</strong> {{ r.bidang_minat }}</p>
+            {% if r.similarity is defined %}
+            <p><strong>Similarity:</strong> {{ "%.2f"|format(r.similarity) }}</p>
+            {% endif %}
+            <a class="file-link" href="{{ url_for('static', filename='uploads/' ~ r.fileName) }}" target="_blank">
+                Lihat PDF
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="text-align:center;">Tidak ada jurnal yang cocok dengan pencarian Anda.</p>
+    {% endif %}
+    {% endif %}
+
+    <!-- Bagian 2: Jurnal Sesuai Bidang Minat -->
+    <h3 style="margin-top: 30px;">Jurnal Sesuai Bidang Minat Anda ({{ results_bidang_minat|length }} ditemukan)</h3>
+    {% if results_bidang_minat %}
+    <div class="card-container">
+        {% for r in results_bidang_minat %}
+        <div class="card">
+            <h3>{{ r.judul }}</h3>
+            <p><strong>Bidang:</strong> {{ r.bidang_minat }}</p>
+            <a class="file-link" href="{{ url_for('static', filename='uploads/' ~ r.fileName) }}" target="_blank">
+                Lihat PDF
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="text-align:center;">Tidak ada jurnal di bidang minat Anda.</p>
+    {% endif %}
+
+</body>
+
+</html>

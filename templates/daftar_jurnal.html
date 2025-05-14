@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar PDF</title>
+</head>
+
+<body>
+    <h2>Daftar PDF yang Diupload</h2>
+
+    {% if pdfs %}
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>No</th>
+            <th>judul</th>
+            <th>Author</th>
+            <th>Abstract</th>
+            <th>File</th>
+            <th>Bidang Minat</th>
+            <th>Waktu Upload</th>
+        </tr>
+        {% for pdf in pdfs %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ pdf[1] }}</td>
+            <td>{{ pdf[2] }}</td>
+            <td>{{ pdf[3] }}</td>
+            <td><a href="{{ url_for('uploaded_file', filename=pdf[4]) }}" target="_blank">Download</a></td>
+            <td>{{ pdf[6] }}</td>
+            <td>{{ pdf[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>Belum ada PDF yang diupload.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('dashboard') }}">← Kembali ke Dashboard</a>
+</body>
+
+</html>

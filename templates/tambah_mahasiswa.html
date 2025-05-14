@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tambah Mahasiswa</title>
+</head>
+
+<body>
+    <h2>Tambah Mahasiswa</h2>
+    <form method="POST">
+        <label>Nama:</label><br>
+        <input type="text" name="username"><br>
+        <label>NIM:</label><br>
+        <input type="text" name="nim"><br>
+        <label>Bidang Minat:</label><br>
+        <select name="bidang_minat" required>
+            <option value="">-- Pilih Bidang --</option>
+            <option value="RPL">RPL</option>
+            <option value="AI">AI</option>
+            <option value="Jarkom">Jarkom</option>
+        </select><br><br>
+        <input type="submit" value="Simpan">
+    </form>
+    <a href="{{ url_for('dashboard') }}">Kembali ke Dashboard</a>
+</body>
+
+</html>
